@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Fercho Tamagotchi - Finanzas Credimex</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tipografía Pixel Art -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --lcd-bg: #8bac0f;
+      --lcd-dark: #0f380f;
+      --lcd-accent: #306230;
+    }
+
+    body {
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      -webkit-tap-highlight-color: transparent;
+      background-color: #020617;
+    }
+
+    /* Pantalla LCD Retro con Scanlines */
+    .lcd-screen {
+      background-color: var(--lcd-bg);
+      color: var(--lcd-dark);
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lcd-screen::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(
+        rgba(15, 56, 15, 0) 50%, 
+        rgba(15, 56, 15, 0.15) 50%
+      );
+      background-size: 100% 4px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Animaciones Pixel Art */
+    @keyframes bounceIdle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes shakeSad {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+
+    .fercho-happy {
+      animation: bounceIdle 0.8s infinite ease-in-out;
+    }
+
+    .fercho-sad {
+      animation: shakeSad 0.4s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-3 select-none text-white">
+
+  <main class="w-full max-w-sm mx-auto flex flex-col items-center">
+    
+    <!-- Carcasa Tamagotchi Credimex -->
+    <div class="w-full bg-emerald-600 border-4 sm:border-8 border-emerald-900 rounded-[2.5rem] p-4 sm:p-6 shadow-2xl flex flex-col items-center relative">
+      
+      <!-- Marca Superior -->
+      <div class="text-center mb-3">
+        <span class="block text-[8px] tracking-widest text-emerald-200 uppercase font-bold">FINANZAS CREDIMEX</span>
+        <h1 class="text-xs sm:text-sm font-extrabold text-white tracking-wider">FERCHO SAVER</h1>
+      </div>
+
+      <!-- Pantalla LCD Principal -->
+      <div class="lcd-screen w-full rounded-xl p-3 border-4 border-emerald-950 flex flex-col items-center">
+        
+        <!-- Header: Hora & Regla 4 PM -->
+        <div class="w-full flex justify-between items-center text-[9px] font-bold border-b-2 border-[#0f380f] pb-1.5 mb-2">
+          <span>HORA: <span id="clock">01:00 PM</span></span>
+          <span id="cutoff-tag" class="bg-[#0f380f] text-[#8bac0f] text-[7px] px-1 py-0.5 rounded">LÍMITE 4 PM</span>
+        </div>
+
+        <!-- Indicadores / Métricas -->
+        <div class="w-full text-[8px] sm:text-[9px] space-y-1">
+          <div class="flex justify-between items-center">
+            <span>CUOTA HOY:</span>
+            <span id="stat-debt" class="font-bold">$500</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span>SALDO CREDIMEX:</span>
+            <span id="stat-balance" class="font-bold">$1,200</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span>FELICIDAD:</span>
+            <span id="stat-happy" class="font-bold">100%</span>
+          </div>
+        </div>
+
+        <!-- Avatar Pixel Art de Fercho -->
+        <div id="fercho-wrapper" class="fercho-happy flex flex-col items-center justify-center my-2 transition-all">
+          <svg class="w-20 h-20 sm:w-24 sm:h-24 fill-current text-[#0f380f]" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <!-- Gorra / Cabeza -->
+            <path d="M4 1h8v1H4zM3 2h10v1H3z" />
+            <path d="M2 3h12v6H2z" />
+            
+            <!-- Ojos -->
+            <path d="M4 4h2v2H4z" fill="#8bac0f" />
+            <path d="M10 4h2v2h-2z" fill="#8bac0f" />
+            
+            <!-- Boca dinámicamente controlada -->
+            <path id="mouth" d="M5 7h6v1H5zM6 8h4v1H6z" fill="#8bac0f" />
+            
+            <!-- Cuerpo y Piez de Fercho -->
+            <path d="M3 9h10v1H3zM4 10h8v4H4z" />
+            <path d="M3 14h4v1H3zM9 14h4v1H9z" />
+          </svg>
+          
+          <span id="fercho-mood-badge" class="text-[8px] sm:text-[9px] bg-[#0f380f] text-[#8bac0f] px-2 py-0.5 mt-1 rounded uppercase font-bold tracking-wider">
+            ¡PUNTUAL Y FELIZ!
+          </span>
+        </div>
+
+        <!-- Terminal de Logs / Notificaciones -->
+        <div id="terminal-log" class="w-full bg-[#0f380f] text-[#8bac0f] text-[7px] sm:text-[8px] p-2 rounded border border-[#306230] min-h-[42px] flex items-center justify-center text-center leading-tight">
+          Paga antes de las 4:00 PM por SPEI u OXXO para evitar recargos.
+        </div>
+      </div>
+
+      <!-- Botones Tactiles de Acción -->
+      <div class="w-full grid grid-cols-2 gap-2 mt-4">
+        
+        <button id="btn-spei" class="bg-teal-700 hover:bg-teal-600 active:translate-y-0.5 text-white text-[8px] sm:text-[9px] py-3 px-1 rounded-xl border-b-4 border-teal-950 font-bold transition flex items-center justify-center">
+          💳 PAGAR SPEI
+        </button>
+
+        <button id="btn-oxxo" class="bg-amber-600 hover:bg-amber-500 active:translate-y-0.5 text-white text-[8px] sm:text-[9px] py-3 px-1 rounded-xl border-b-4 border-amber-900 font-bold transition flex items-center justify-center">
+          🏪 PAGAR OXXO
+        </button>
+
+        <button id="btn-advance" class="col-span-2 bg-indigo-700 hover:bg-indigo-600 active:translate-y-0.5 text-white text-[8px] sm:text-[9px] py-3 px-1 rounded-xl border-b-4 border-indigo-950 font-bold transition flex items-center justify-center">
+          ⏰ AVANZAR 1 HORA (+1H)
+        </button>
+      </div>
+
+      <!-- Altavoz Retro Decorative -->
+      <div class="flex gap-1.5 mt-3">
+        <div class="w-1.5 h-1.5 rounded-full bg-emerald-900"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-emerald-900"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-emerald-900"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Variables de Estado
+    let hour = 13; // 1:00 PM inicial
+    let debt = 500;
+    let balance = 1200;
+    let happy = 100;
+    let isPaidToday = false;
+
+    // Elementos del DOM
+    const clockEl = document.getElementById('clock');
+    const debtEl = document.getElementById('stat-debt');
+    const balanceEl = document.getElementById('stat-balance');
+    const happyEl = document.getElementById('stat-happy');
+    const logEl = document.getElementById('terminal-log');
+    const moodBadge = document.getElementById('fercho-mood-badge');
+    const ferchoWrapper = document.getElementById('fercho-wrapper');
+    const mouth = document.getElementById('mouth');
+
+    // Generador de Efectos Sonoros Retro (Web Audio API)
+    function playAudioFx(type) {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'pay') {
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        } else if (type === 'tick') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(320, ctx.currentTime);
+          gain.gain.setValueAtTime(0.04, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.05);
+        } else if (type === 'penalty') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          osc.frequency.setValueAtTime(130, ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.4);
+        }
+      } catch (e) {}
+    }
+
+    // Renderizar la Interfaz
+    function updateScreen() {
+      const period = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+      const timeStr = `${String(displayHour).padStart(2, '0')}:00 ${period}`;
+      
+      clockEl.innerText = timeStr;
+      debtEl.innerText = `$${debt}`;
+      balanceEl.innerText = `$${balance}`;
+      happyEl.innerText = `${happy}%`;
+
+      // Expresión visual según felicidad/deuda
+      if (happy < 50 || debt > 800) {
+        ferchoWrapper.className = 'fercho-sad flex flex-col items-center justify-center my-2 transition-all';
+        moodBadge.innerText = '¡PREOCUPADO!';
+        moodBadge.className = 'text-[8px] sm:text-[9px] bg-red-900 text-red-200 px-2 py-0.5 mt-1 rounded uppercase font-bold tracking-wider';
+        mouth.setAttribute('d', 'M6 7h4v1H6zM5 8h6v1H5z'); // Cara triste
+      } else {
+        ferchoWrapper.className = 'fercho-happy flex flex-col items-center justify-center my-2 transition-all';
+        moodBadge.innerText = '¡PUNTUAL Y FELIZ!';
+        moodBadge.className = 'text-[8px] sm:text-[9px] bg-[#0f380f] text-[#8bac0f] px-2 py-0.5 mt-1 rounded uppercase font-bold tracking-wider';
+        mouth.setAttribute('d', 'M5 7h6v1H5zM6 8h4v1H6z'); // Cara feliz
+      }
+    }
+
+    // Procesar Pago (SPEI u OXXO)
+    function executePayment(method) {
+      if (debt <= 0) {
+        logEl.innerText = '¡Genial! No tienes cuotas pendientes hoy.';
+        return;
+      }
+
+      playAudioFx('pay');
+      debt = 0;
+      balance += 50; // Bonificación / Descuento Credimex
+      happy = Math.min(100, happy + 25);
+      isPaidToday = true;
+
+      logEl.innerText = `¡Pago por ${method} realizado! Obtuviste beneficio Credimex.`;
+      updateScreen();
+    }
+
+    // Avanzar Simulador de Tiempo
+    function advanceTime() {
+      playAudioFx('tick');
+      hour = (hour + 1) % 24;
+
+      // Regla de las 4:00 PM (Límite Credimex)
+      if (hour === 16 && !isPaidToday && debt > 0) {
+        playAudioFx('penalty');
+        debt += 150; // Recargo
+        happy = Math.max(0, happy - 40);
+        logEl.innerText = '⚠️ ¡PASARON LAS 4:00 PM! Se cargó una multa de $150 por pago tardío.';
+      } else if (hour === 0) {
+        // Reinicio diario
+        isPaidToday = false;
+        debt = 500;
+        logEl.innerText = '¡Nuevo día iniciado! Recuerda abonar antes de las 4:00 PM.';
+      }
+
+      updateScreen();
+    }
+
+    // Eventos
+    document.getElementById('btn-spei').addEventListener('click', () => executePayment('SPEI'));
+    document.getElementById('btn-oxxo').addEventListener('click', () => executePayment('OXXO'));
+    document.getElementById('btn-advance').addEventListener('click', advanceTime);
+
+    // Inicio
+    updateScreen();
+  </script>
+</body>
+</html>
