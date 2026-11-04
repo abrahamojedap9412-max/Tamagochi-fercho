@@ -6,289 +6,703 @@
   <title>Fercho Tamagotchi - Finanzas Credimex</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Tipografía Pixel Art -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
   
   <style>
-    :root {
-      --lcd-bg: #8bac0f;
-      --lcd-dark: #0f380f;
-      --lcd-accent: #306230;
-    }
-
     body {
       font-family: 'Press Start 2P', monospace;
       image-rendering: pixelated;
-      -webkit-tap-highlight-color: transparent;
-      background-color: #020617;
+      background-color: #090d16;
+      touch-action: manipulation;
     }
 
-    /* Pantalla LCD Retro con Scanlines */
-    .lcd-screen {
-      background-color: var(--lcd-bg);
-      color: var(--lcd-dark);
-      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.45);
+    .font-vt {
+      font-family: 'VT323', monospace;
+    }
+
+    /* Handheld Case Styling */
+    .tamagotchi-body {
+      background: linear-gradient(165deg, #059669 0%, #10b981 35%, #047857 70%, #064e3b 100%);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.35), inset 0 3px 8px rgba(255, 255, 255, 0.4), inset 0 -6px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Retro Screen Container */
+    .lcd-frame {
+      background: #78866b;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 0 0 4px #064e3b, 0 0 0 8px #022c22;
       position: relative;
-      overflow: hidden;
     }
 
-    .lcd-screen::before {
-      content: " ";
-      display: block;
+    .lcd-screen {
+      background-color: #9bbc0f;
+      background-image: 
+        radial-gradient(#8bac0f 15%, transparent 16%),
+        radial-gradient(#8bac0f 15%, transparent 16%);
+      background-size: 8px 8px;
+      background-position: 0 0, 4px 4px;
+    }
+
+    /* Scanline Overlay */
+    .scanlines::after {
+      content: "";
       position: absolute;
-      top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(
-        rgba(15, 56, 15, 0) 50%, 
-        rgba(15, 56, 15, 0.15) 50%
-      );
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(rgba(15, 56, 15, 0) 50%, rgba(15, 56, 15, 0.25) 50%);
       background-size: 100% 4px;
-      z-index: 10;
       pointer-events: none;
+      z-index: 20;
     }
 
-    /* Animaciones Pixel Art */
-    @keyframes bounceIdle {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+    /* Floating Particles */
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-30px) scale(1.3); }
+    }
+    .particle {
+      position: absolute;
+      animation: floatUp 1s forwards ease-out;
+      pointer-events: none;
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 30;
     }
 
-    @keyframes shakeSad {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-3px); }
-      75% { transform: translateX(3px); }
-    }
-
-    .fercho-happy {
-      animation: bounceIdle 0.8s infinite ease-in-out;
-    }
-
-    .fercho-sad {
-      animation: shakeSad 0.4s infinite ease-in-out;
+    canvas {
+      image-rendering: pixelated;
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-3 select-none text-white">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-100 select-none">
 
-  <main class="w-full max-w-sm mx-auto flex flex-col items-center">
+  <main class="w-full max-w-md mx-auto flex flex-col items-center">
     
-    <!-- Carcasa Tamagotchi Credimex -->
-    <div class="w-full bg-emerald-600 border-4 sm:border-8 border-emerald-900 rounded-[2.5rem] p-4 sm:p-6 shadow-2xl flex flex-col items-center relative">
+    <!-- TAMAGOTCHI DEVICE -->
+    <div class="tamagotchi-body w-full rounded-[3rem] p-4 sm:p-6 border-4 border-emerald-400/40 relative">
       
-      <!-- Marca Superior -->
-      <div class="text-center mb-3">
-        <span class="block text-[8px] tracking-widest text-emerald-200 uppercase font-bold">FINANZAS CREDIMEX</span>
-        <h1 class="text-xs sm:text-sm font-extrabold text-white tracking-wider">FERCHO SAVER</h1>
+      <!-- BRAND HEADER -->
+      <div class="text-center mb-3 flex flex-col items-center">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping"></span>
+          <span class="text-[9px] tracking-widest text-emerald-100 font-bold uppercase">FINANZAS CREDIMEX</span>
+        </div>
+        <h1 class="text-sm sm:text-base font-black text-amber-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-wider mt-0.5">
+          FERCHO SAVER PET
+        </h1>
+        <!-- MOTIVATIONAL BANNER -->
+        <div class="mt-1 bg-amber-400 text-amber-950 font-black text-[9px] sm:text-[10px] px-3 py-1 rounded-full border-2 border-amber-600 shadow-md animate-pulse">
+          🔥 ¡HAZLO POR LAS MALPORTADAS! 🔥
+        </div>
       </div>
 
-      <!-- Pantalla LCD Principal -->
-      <div class="lcd-screen w-full rounded-xl p-3 border-4 border-emerald-950 flex flex-col items-center">
-        
-        <!-- Header: Hora & Regla 4 PM -->
-        <div class="w-full flex justify-between items-center text-[9px] font-bold border-b-2 border-[#0f380f] pb-1.5 mb-2">
-          <span>HORA: <span id="clock">01:00 PM</span></span>
-          <span id="cutoff-tag" class="bg-[#0f380f] text-[#8bac0f] text-[7px] px-1 py-0.5 rounded">LÍMITE 4 PM</span>
-        </div>
-
-        <!-- Indicadores / Métricas -->
-        <div class="w-full text-[8px] sm:text-[9px] space-y-1">
-          <div class="flex justify-between items-center">
-            <span>CUOTA HOY:</span>
-            <span id="stat-debt" class="font-bold">$500</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span>SALDO CREDIMEX:</span>
-            <span id="stat-balance" class="font-bold">$1,200</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span>FELICIDAD:</span>
-            <span id="stat-happy" class="font-bold">100%</span>
-          </div>
-        </div>
-
-        <!-- Avatar Pixel Art de Fercho -->
-        <div id="fercho-wrapper" class="fercho-happy flex flex-col items-center justify-center my-2 transition-all">
-          <svg class="w-20 h-20 sm:w-24 sm:h-24 fill-current text-[#0f380f]" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-            <!-- Gorra / Cabeza -->
-            <path d="M4 1h8v1H4zM3 2h10v1H3z" />
-            <path d="M2 3h12v6H2z" />
-            
-            <!-- Ojos -->
-            <path d="M4 4h2v2H4z" fill="#8bac0f" />
-            <path d="M10 4h2v2h-2z" fill="#8bac0f" />
-            
-            <!-- Boca dinámicamente controlada -->
-            <path id="mouth" d="M5 7h6v1H5zM6 8h4v1H6z" fill="#8bac0f" />
-            
-            <!-- Cuerpo y Piez de Fercho -->
-            <path d="M3 9h10v1H3zM4 10h8v4H4z" />
-            <path d="M3 14h4v1H3zM9 14h4v1H9z" />
-          </svg>
+      <!-- LCD SCREEN FRAME -->
+      <div class="lcd-frame rounded-2xl p-3 sm:p-4 scanlines relative overflow-hidden">
+        <div class="lcd-screen rounded-lg p-2 text-[#0f380f] flex flex-col items-center relative">
           
-          <span id="fercho-mood-badge" class="text-[8px] sm:text-[9px] bg-[#0f380f] text-[#8bac0f] px-2 py-0.5 mt-1 rounded uppercase font-bold tracking-wider">
-            ¡PUNTUAL Y FELIZ!
-          </span>
-        </div>
+          <!-- TOP STATUS BAR -->
+          <div class="w-full flex justify-between items-center text-[9px] font-bold border-b-2 border-[#0f380f] pb-1.5 mb-1.5">
+            <div class="flex items-center gap-1">
+              <span>⏰</span>
+              <span id="clock-display" class="font-mono text-[10px]">01:00 PM</span>
+            </div>
+            <div id="cutoff-badge" class="bg-[#0f380f] text-[#9bbc0f] text-[7px] px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">
+              LÍMITE 4:00 PM
+            </div>
+          </div>
 
-        <!-- Terminal de Logs / Notificaciones -->
-        <div id="terminal-log" class="w-full bg-[#0f380f] text-[#8bac0f] text-[7px] sm:text-[8px] p-2 rounded border border-[#306230] min-h-[42px] flex items-center justify-center text-center leading-tight">
-          Paga antes de las 4:00 PM por SPEI u OXXO para evitar recargos.
+          <!-- METRICS HUD -->
+          <div class="w-full grid grid-cols-2 gap-1 text-[8px] font-bold bg-[#8bac0f]/40 p-1.5 rounded border border-[#0f380f]/30 mb-1">
+            <div>CUOTA: <span id="stat-debt" class="text-red-900 font-black">$300</span></div>
+            <div class="text-right">SALDO: <span id="stat-balance" class="text-emerald-950 font-black">$1,000</span></div>
+            <div>ÁNIMO: <span id="stat-happy">100%</span></div>
+            <div class="text-right">PUNTO: <span id="stat-score" class="text-blue-950">750 pts</span></div>
+          </div>
+
+          <!-- CANVAS SPRITE RENDERER -->
+          <div class="relative w-full flex justify-center items-center py-1">
+            <canvas id="fercho-canvas" width="200" height="130" class="cursor-pointer" onclick="petFercho()"></canvas>
+            
+            <!-- FLOATING POPUP LAYER -->
+            <div id="particle-layer" class="absolute inset-0 pointer-events-none"></div>
+          </div>
+
+          <!-- MOOD BADGE -->
+          <div id="mood-tag" class="text-[8px] bg-[#0f380f] text-[#9bbc0f] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mb-1">
+            😃 ¡AL DÍA Y FELIZ!
+          </div>
+
+          <!-- DIALOGUE / LOG BOX -->
+          <div id="dialogue-box" class="w-full bg-[#0f380f] text-[#9bbc0f] font-vt text-sm sm:text-base px-2 py-1 rounded border border-[#306230] min-h-[44px] flex items-center justify-center text-center leading-tight">
+            "Paga tu cuota antes de las 4:00 PM para evitar el recargo de $150."
+          </div>
+
         </div>
       </div>
 
-      <!-- Botones Tactiles de Acción -->
+      <!-- MAIN INTERACTIVE BUTTONS -->
       <div class="w-full grid grid-cols-2 gap-2 mt-4">
         
-        <button id="btn-spei" class="bg-teal-700 hover:bg-teal-600 active:translate-y-0.5 text-white text-[8px] sm:text-[9px] py-3 px-1 rounded-xl border-b-4 border-teal-950 font-bold transition flex items-center justify-center">
-          💳 PAGAR SPEI
+        <button id="btn-spei" onclick="payInstallment('SPEI')" class="bg-emerald-500 hover:bg-emerald-400 active:translate-y-1 text-emerald-950 font-black text-[9px] sm:text-[10px] py-3 px-1 rounded-xl border-b-4 border-emerald-800 shadow-lg flex items-center justify-center gap-1 transition">
+          ⚡ PAGAR SPEI ($100)
         </button>
 
-        <button id="btn-oxxo" class="bg-amber-600 hover:bg-amber-500 active:translate-y-0.5 text-white text-[8px] sm:text-[9px] py-3 px-1 rounded-xl border-b-4 border-amber-900 font-bold transition flex items-center justify-center">
-          🏪 PAGAR OXXO
+        <button id="btn-oxxo" onclick="payInstallment('OXXO')" class="bg-amber-400 hover:bg-amber-300 active:translate-y-1 text-amber-950 font-black text-[9px] sm:text-[10px] py-3 px-1 rounded-xl border-b-4 border-amber-600 shadow-lg flex items-center justify-center gap-1 transition">
+          🏪 PAGAR OXXO ($100)
         </button>
 
-        <button id="btn-advance" class="col-span-2 bg-indigo-700 hover:bg-indigo-600 active:translate-y-0.5 text-white text-[8px] sm:text-[9px] py-3 px-1 rounded-xl border-b-4 border-indigo-950 font-bold transition flex items-center justify-center">
-          ⏰ AVANZAR 1 HORA (+1H)
+        <button id="btn-[#7-3]" onclick="play73Audio()" class="bg-red-600 hover:bg-red-500 active:translate-y-1 text-white font-black text-[9px] sm:text-[10px] py-2.5 px-1 rounded-xl border-b-4 border-red-950 shadow-lg flex items-center justify-center gap-1 transition animate-bounce">
+          🚬 7-3 MARLBORO
         </button>
+
+        <button id="btn-invest" onclick="investMoney()" class="bg-sky-400 hover:bg-sky-300 active:translate-y-1 text-sky-950 font-black text-[9px] sm:text-[10px] py-2.5 px-1 rounded-xl border-b-4 border-sky-600 shadow-lg flex items-center justify-center gap-1 transition">
+          📈 INVERTIR ($50)
+        </button>
+
       </div>
 
-      <!-- Altavoz Retro Decorative -->
-      <div class="flex gap-1.5 mt-3">
-        <div class="w-1.5 h-1.5 rounded-full bg-emerald-900"></div>
-        <div class="w-1.5 h-1.5 rounded-full bg-emerald-900"></div>
-        <div class="w-1.5 h-1.5 rounded-full bg-emerald-900"></div>
+      <!-- TIME SIMULATION BUTTONS -->
+      <div class="mt-3 bg-emerald-950/60 p-2 rounded-xl border border-emerald-500/30 flex items-center justify-between gap-1">
+        <span class="text-[8px] font-bold text-emerald-200">CONTROL TIEMPO:</span>
+        <div class="flex gap-1">
+          <button onclick="advanceTime(1)" class="bg-purple-700 hover:bg-purple-600 active:scale-95 text-white text-[8px] px-2 py-1.5 rounded-lg border-b-2 border-purple-900 font-bold">
+            +1 hora
+          </button>
+          <button onclick="advanceTime(3)" class="bg-purple-700 hover:bg-purple-600 active:scale-95 text-white text-[8px] px-2 py-1.5 rounded-lg border-b-2 border-purple-900 font-bold">
+            +3 horas
+          </button>
+          <button onclick="toggleFastMode()" id="fast-btn" class="bg-pink-600 hover:bg-pink-500 active:scale-95 text-white text-[8px] px-2 py-1.5 rounded-lg border-b-2 border-pink-900 font-bold">
+            ⚡ 2x
+          </button>
+        </div>
       </div>
 
     </div>
   </main>
 
   <script>
-    // Variables de Estado
-    let hour = 13; // 1:00 PM inicial
-    let debt = 500;
-    let balance = 1200;
-    let happy = 100;
-    let isPaidToday = false;
+    // --- STATE MANAGEMENT ---
+    const state = {
+      hour: 13, // 1:00 PM start
+      minute: 0,
+      day: 1,
+      debt: 300,
+      balance: 1000,
+      happiness: 90,
+      score: 750,
+      paidToday: false,
+      lateFeeAppliedToday: false,
+      
+      // Animations & States
+      actionState: 'idle', // 'idle', 'eating', 'dancing', 'crying', 'sleeping', 'anxious', 'party'
+      actionTimer: 0,
+      fastMode: false,
+      fastInterval: null,
+      soundEnabled: true
+    };
 
-    // Elementos del DOM
-    const clockEl = document.getElementById('clock');
-    const debtEl = document.getElementById('stat-debt');
-    const balanceEl = document.getElementById('stat-balance');
-    const happyEl = document.getElementById('stat-happy');
-    const logEl = document.getElementById('terminal-log');
-    const moodBadge = document.getElementById('fercho-mood-badge');
-    const ferchoWrapper = document.getElementById('fercho-wrapper');
-    const mouth = document.getElementById('mouth');
+    // Random quotes pool
+    const ferchoQuotes = [
+      "¡Qué pasó rey! ¿Cómo van las rutas pao?",
+      "Abraham recuerda que el dinero es el medio, no el final.",
+      "Pongan 7-3, Marlboro rojo pao.",
+      "Cuida el flujo de caja, campeón.",
+      "Antes de las 4 PM para evitar recargos."
+    ];
 
-    // Generador de Efectos Sonoros Retro (Web Audio API)
-    function playAudioFx(type) {
+    function getRandomQuote() {
+      return ferchoQuotes[Math.floor(Math.random() * ferchoQuotes.length)];
+    }
+
+    // --- WEB AUDIO API SOUND SYSTEM ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!state.soundEnabled) return;
       try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
 
         if (type === 'pay') {
-          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
-          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16);
-          gain.gain.setValueAtTime(0.1, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.3);
-        } else if (type === 'tick') {
           osc.type = 'square';
-          osc.frequency.setValueAtTime(320, ctx.currentTime);
-          gain.gain.setValueAtTime(0.04, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.05);
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+          osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'eat') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.setValueAtTime(450, now + 0.06);
+          osc.frequency.setValueAtTime(600, now + 0.12);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'invest') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(880, now + 0.1);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
         } else if (type === 'penalty') {
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(220, ctx.currentTime);
-          osc.frequency.setValueAtTime(130, ctx.currentTime + 0.15);
-          gain.gain.setValueAtTime(0.15, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.4);
+          osc.frequency.setValueAtTime(280, now);
+          osc.frequency.setValueAtTime(140, now + 0.15);
+          osc.frequency.setValueAtTime(90, now + 0.3);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else if (type === 'click') {
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(400, now);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
         }
       } catch (e) {}
     }
 
-    // Renderizar la Interfaz
-    function updateScreen() {
-      const period = hour >= 12 ? 'PM' : 'AM';
-      const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-      const timeStr = `${String(displayHour).padStart(2, '0')}:00 ${period}`;
-      
-      clockEl.innerText = timeStr;
-      debtEl.innerText = `$${debt}`;
-      balanceEl.innerText = `$${balance}`;
-      happyEl.innerText = `${happy}%`;
+    // --- CANVAS PIXEL ART SPRITE ENGINE ---
+    const canvas = document.getElementById('fercho-canvas');
+    const ctx = canvas.getContext('2d');
+    let frameCount = 0;
 
-      // Expresión visual según felicidad/deuda
-      if (happy < 50 || debt > 800) {
-        ferchoWrapper.className = 'fercho-sad flex flex-col items-center justify-center my-2 transition-all';
-        moodBadge.innerText = '¡PREOCUPADO!';
-        moodBadge.className = 'text-[8px] sm:text-[9px] bg-red-900 text-red-200 px-2 py-0.5 mt-1 rounded uppercase font-bold tracking-wider';
-        mouth.setAttribute('d', 'M6 7h4v1H6zM5 8h6v1H5z'); // Cara triste
+    function drawPixelBlock(x, y, color, scale = 4) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x * scale, y * scale, scale, scale);
+    }
+
+    function renderSprite() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Multi-tone pixel art palette
+      const skinTone = '#ffcd94';
+      const skinShadow = '#e09f67';
+      const hairColor = '#2b1b17';
+      const shirtColor = '#1d4ed8'; // Vibrant blue shirt
+      const shirtCollar = '#60a5fa'; // Light blue detail
+      const pantsColor = '#1e293b';
+      const shoeColor = '#475569';
+      const darkOutline = '#0f172a';
+      const scale = 4;
+      
+      // Bounce / Animation frames
+      frameCount++;
+      let offsetY = Math.floor(Math.sin(frameCount * 0.15) * 2);
+      let isSleeping = state.hour >= 22 || state.hour < 6;
+
+      if (isSleeping) {
+        state.actionState = 'sleeping';
+      }
+
+      const startX = 17;
+      const startY = 4 + offsetY;
+
+      if (state.actionState === 'dancing' || state.actionState === 'party') {
+        offsetY = Math.floor(Math.abs(Math.sin(frameCount * 0.3)) * -4);
+      } else if (state.actionState === 'crying' || state.actionState === 'anxious') {
+        offsetY = Math.floor(Math.sin(frameCount * 0.5) * 2);
+      }
+
+      // --- FLOOR LINE ---
+      for (let c = 2; c < 48; c++) {
+        drawPixelBlock(c, 27, darkOutline, scale);
+      }
+
+      // --- HUMAN CHARACTER: FERCHO (POLISHED MULTI-COLOR PIXEL ART) ---
+      
+      // HAIR
+      for (let c = 6; c <= 15; c++) drawPixelBlock(startX + c, startY + 0, hairColor, scale);
+      for (let c = 5; c <= 16; c++) drawPixelBlock(startX + c, startY + 1, hairColor, scale);
+
+      // HEAD / SKIN
+      for (let r = 2; r <= 8; r++) {
+        for (let c = 5; c <= 16; c++) {
+          drawPixelBlock(startX + c, startY + r, skinTone, scale);
+        }
+      }
+      // Skin shadow
+      for (let c = 5; c <= 16; c++) drawPixelBlock(startX + c, startY + 8, skinShadow, scale);
+
+      // EARS
+      drawPixelBlock(startX + 4, startY + 5, skinShadow, scale);
+      drawPixelBlock(startX + 17, startY + 5, skinShadow, scale);
+
+      // EYES & EXPRESSIONS
+      if (state.actionState === 'sleeping') {
+        // Closed Eyes (-)
+        drawPixelBlock(startX + 7, startY + 5, darkOutline, scale);
+        drawPixelBlock(startX + 8, startY + 5, darkOutline, scale);
+        drawPixelBlock(startX + 13, startY + 5, darkOutline, scale);
+        drawPixelBlock(startX + 14, startY + 5, darkOutline, scale);
+        if (Math.floor(frameCount / 20) % 2 === 0) {
+          ctx.font = '12px "Press Start 2P"';
+          ctx.fillStyle = darkOutline;
+          ctx.fillText('Zzz...', 150, 40);
+        }
+      } else if (state.actionState === 'anxious' || state.actionState === 'crying') {
+        // Anxious / Crying eyes
+        drawPixelBlock(startX + 7, startY + 4, darkOutline, scale);
+        drawPixelBlock(startX + 8, startY + 5, darkOutline, scale);
+        drawPixelBlock(startX + 13, startY + 4, darkOutline, scale);
+        drawPixelBlock(startX + 14, startY + 5, darkOutline, scale);
+        // Sweat drop
+        drawPixelBlock(startX + 17, startY + 3, '#38bdf8', scale);
+        drawPixelBlock(startX + 18, startY + 4, '#0284c7', scale);
       } else {
-        ferchoWrapper.className = 'fercho-happy flex flex-col items-center justify-center my-2 transition-all';
-        moodBadge.innerText = '¡PUNTUAL Y FELIZ!';
-        moodBadge.className = 'text-[8px] sm:text-[9px] bg-[#0f380f] text-[#8bac0f] px-2 py-0.5 mt-1 rounded uppercase font-bold tracking-wider';
-        mouth.setAttribute('d', 'M5 7h6v1H5zM6 8h4v1H6z'); // Cara feliz
+        // Normal Sharp Pixel Eyes
+        drawPixelBlock(startX + 7, startY + 4, darkOutline, scale);
+        drawPixelBlock(startX + 8, startY + 4, darkOutline, scale);
+        drawPixelBlock(startX + 7, startY + 5, darkOutline, scale);
+        drawPixelBlock(startX + 8, startY + 5, darkOutline, scale);
+
+        drawPixelBlock(startX + 13, startY + 4, darkOutline, scale);
+        drawPixelBlock(startX + 14, startY + 4, darkOutline, scale);
+        drawPixelBlock(startX + 13, startY + 5, darkOutline, scale);
+        drawPixelBlock(startX + 14, startY + 5, darkOutline, scale);
+      }
+
+      // NOSE
+      drawPixelBlock(startX + 10, startY + 6, skinShadow, scale);
+      drawPixelBlock(startX + 11, startY + 6, skinShadow, scale);
+
+      // MOUTH
+      if (state.actionState === 'eating') {
+        for (let r = 7; r <= 8; r++) {
+          for (let c = 9; c <= 12; c++) drawPixelBlock(startX + c, startY + r, '#b91c1c', scale);
+        }
+      } else if (state.happiness < 40 || state.actionState === 'anxious' || state.actionState === 'crying') {
+        // Frown Mouth
+        drawPixelBlock(startX + 9, startY + 8, darkOutline, scale);
+        drawPixelBlock(startX + 10, startY + 7, darkOutline, scale);
+        drawPixelBlock(startX + 11, startY + 7, darkOutline, scale);
+        drawPixelBlock(startX + 12, startY + 8, darkOutline, scale);
+      } else {
+        // Smile
+        drawPixelBlock(startX + 8, startY + 7, darkOutline, scale);
+        drawPixelBlock(startX + 9, startY + 8, darkOutline, scale);
+        drawPixelBlock(startX + 10, startY + 8, darkOutline, scale);
+        drawPixelBlock(startX + 11, startY + 8, darkOutline, scale);
+        drawPixelBlock(startX + 12, startY + 7, darkOutline, scale);
+      }
+
+      // NECK
+      drawPixelBlock(startX + 9, startY + 9, skinShadow, scale);
+      drawPixelBlock(startX + 10, startY + 9, skinShadow, scale);
+      drawPixelBlock(startX + 11, startY + 9, skinShadow, scale);
+      drawPixelBlock(startX + 12, startY + 9, skinShadow, scale);
+
+      // --- COLLARED SHIRT (CAMISA DE VESTIR) ---
+      for (let r = 10; r <= 17; r++) {
+        for (let c = 5; c <= 16; c++) {
+          drawPixelBlock(startX + c, startY + r, shirtColor, scale);
+        }
+      }
+
+      // Collar Details & Buttons
+      drawPixelBlock(startX + 8, startY + 10, shirtCollar, scale);
+      drawPixelBlock(startX + 13, startY + 10, shirtCollar, scale);
+      drawPixelBlock(startX + 10, startY + 11, '#ffffff', scale);
+      drawPixelBlock(startX + 11, startY + 11, '#ffffff', scale);
+      drawPixelBlock(startX + 10, startY + 14, '#ffffff', scale);
+      drawPixelBlock(startX + 11, startY + 14, '#ffffff', scale);
+
+      // ARMS & HANDS
+      if (state.actionState === 'dancing' || state.actionState === 'party') {
+        for (let r = 7; r <= 11; r++) {
+          drawPixelBlock(startX + 3, startY + r, shirtColor, scale);
+          drawPixelBlock(startX + 18, startY + r, shirtColor, scale);
+        }
+        drawPixelBlock(startX + 3, startY + 6, skinTone, scale);
+        drawPixelBlock(startX + 18, startY + 6, skinTone, scale);
+      } else {
+        for (let r = 10; r <= 16; r++) {
+          drawPixelBlock(startX + 3, startY + r, shirtColor, scale);
+          drawPixelBlock(startX + 18, startY + r, shirtColor, scale);
+        }
+        drawPixelBlock(startX + 3, startY + 17, skinTone, scale);
+        drawPixelBlock(startX + 18, startY + 17, skinTone, scale);
+      }
+
+      // PANTS & SHOES
+      for (let r = 18; r <= 22; r++) {
+        for (let c = 6; c <= 9; c++) drawPixelBlock(startX + c, startY + r, pantsColor, scale);
+        for (let c = 12; c <= 15; c++) drawPixelBlock(startX + c, startY + r, pantsColor, scale);
+      }
+      // Shoes
+      for (let c = 5; c <= 9; c++) drawPixelBlock(startX + c, startY + 23, shoeColor, scale);
+      for (let c = 12; c <= 16; c++) drawPixelBlock(startX + c, startY + 23, shoeColor, scale);
+    }
+
+    // --- UI UPDATER ---
+    function updateUI() {
+      // Clock Format
+      const period = state.hour >= 12 ? 'PM' : 'AM';
+      let displayHour = state.hour % 12;
+      if (displayHour === 0) displayHour = 12;
+      const minStr = state.minute < 10 ? `0${state.minute}` : state.minute;
+      
+      document.getElementById('clock-display').innerText = `Día ${state.day} - ${displayHour}:${minStr} ${period}`;
+      document.getElementById('stat-debt').innerText = `$${state.debt}`;
+      document.getElementById('stat-balance').innerText = `$${state.balance}`;
+      document.getElementById('stat-happy').innerText = `${Math.round(state.happiness)}%`;
+      document.getElementById('stat-score').innerText = `${state.score} pts`;
+
+      // Cutoff Badge Alert
+      const badge = document.getElementById('cutoff-badge');
+      if (state.hour >= 16 && !state.paidToday && state.debt > 0) {
+        badge.innerText = "¡MORA ACTIVADA!";
+        badge.className = "bg-red-900 text-yellow-300 text-[7px] px-1.5 py-0.5 rounded uppercase font-black animate-bounce";
+      } else {
+        badge.innerText = "LÍMITE 4:00 PM";
+        badge.className = "bg-[#0f380f] text-[#9bbc0f] text-[7px] px-1.5 py-0.5 rounded uppercase tracking-wider";
+      }
+
+      // Mood Tag Text
+      const moodTag = document.getElementById('mood-tag');
+      if (state.debt === 0 && state.balance >= 1200) {
+        moodTag.innerText = "🔥 ¡META CUMPLIDA!";
+        moodTag.className = "text-[8px] bg-purple-950 text-purple-200 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mb-1 animate-pulse";
+      } else if (state.happiness < 40 || (state.hour >= 16 && !state.paidToday)) {
+        moodTag.innerText = "⚡ ¡NECESITA PASE!";
+        moodTag.className = "text-[8px] bg-red-950 text-red-300 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mb-1";
+      } else if (state.paidToday) {
+        moodTag.innerText = "😎 ¡VAMOS REY!";
+        moodTag.className = "text-[8px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mb-1";
+      } else {
+        moodTag.innerText = "👔 FERCHO AL DÍA";
+        moodTag.className = "text-[8px] bg-[#0f380f] text-[#9bbc0f] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider mb-1";
       }
     }
 
-    // Procesar Pago (SPEI u OXXO)
-    function executePayment(method) {
-      if (debt <= 0) {
-        logEl.innerText = '¡Genial! No tienes cuotas pendientes hoy.';
+    function setDialogue(msg) {
+      document.getElementById('dialogue-box').innerText = msg;
+    }
+
+    function spawnParticle(text, color = 'text-amber-300') {
+      const layer = document.getElementById('particle-layer');
+      const p = document.createElement('div');
+      p.className = `particle ${color}`;
+      p.style.left = `${30 + Math.random() * 40}%`;
+      p.style.top = `40%`;
+      p.innerText = text;
+      layer.appendChild(p);
+
+      setTimeout(() => p.remove(), 1000);
+    }
+
+    // --- INTERACTIVE ACTIONS ---
+
+    function payInstallment(method) {
+      playSound('click');
+
+      if (state.debt <= 0) {
+        if (state.balance >= 1200) {
+          setDialogue("🔥 ¡Vamos con las malportadas!");
+          triggerActionState('party', 3500);
+          spawnParticle('🎉 MALPORTADAS!', 'text-purple-300');
+        } else {
+          setDialogue("¡No tienes cuotas pendientes hoy, rey!");
+        }
         return;
       }
 
-      playAudioFx('pay');
-      debt = 0;
-      balance += 50; // Bonificación / Descuento Credimex
-      happy = Math.min(100, happy + 25);
-      isPaidToday = true;
-
-      logEl.innerText = `¡Pago por ${method} realizado! Obtuviste beneficio Credimex.`;
-      updateScreen();
-    }
-
-    // Avanzar Simulador de Tiempo
-    function advanceTime() {
-      playAudioFx('tick');
-      hour = (hour + 1) % 24;
-
-      // Regla de las 4:00 PM (Límite Credimex)
-      if (hour === 16 && !isPaidToday && debt > 0) {
-        playAudioFx('penalty');
-        debt += 150; // Recargo
-        happy = Math.max(0, happy - 40);
-        logEl.innerText = '⚠️ ¡PASARON LAS 4:00 PM! Se cargó una multa de $150 por pago tardío.';
-      } else if (hour === 0) {
-        // Reinicio diario
-        isPaidToday = false;
-        debt = 500;
-        logEl.innerText = '¡Nuevo día iniciado! Recuerda abonar antes de las 4:00 PM.';
+      if (state.balance < 100) {
+        setDialogue("❌ Saldo insuficiente en tu cuenta para abonar $100.");
+        playSound('penalty');
+        return;
       }
 
-      updateScreen();
+      state.balance -= 100;
+      state.debt = Math.max(0, state.debt - 100);
+      state.happiness = Math.min(100, state.happiness + 20);
+
+      playSound('pay');
+      spawnParticle('-$100 💳', 'text-emerald-300');
+
+      if (state.debt === 0 && state.balance >= 1200) {
+        setDialogue("🔥 ¡Vamos con las malportadas!");
+        triggerActionState('party', 4000);
+      } else if (state.hour < 16) {
+        state.paidToday = true;
+        state.score += 25;
+        state.balance += 20; // Credimex reward
+        setDialogue(`¡¡VAMOS REY!! Pago por ${method} a tiempo. Credimex te bonifica +$20.`);
+        triggerActionState('dancing', 3000);
+      } else {
+        setDialogue(`Pago por ${method} recibido pero pasó de las 4 PM, pao.`);
+      }
+
+      updateUI();
     }
 
-    // Eventos
-    document.getElementById('btn-spei').addEventListener('click', () => executePayment('SPEI'));
-    document.getElementById('btn-oxxo').addEventListener('click', () => executePayment('OXXO'));
-    document.getElementById('btn-advance').addEventListener('click', advanceTime);
+    function giveTreat() {
+      playSound('click');
+      if (state.balance < 30) {
+        setDialogue("❌ Necesitas $30 de saldo para un Marlboro o café.");
+        return;
+      }
 
-    // Inicio
-    updateScreen();
+      state.balance -= 30;
+      state.happiness = Math.min(100, state.happiness + 15);
+      playSound('eat');
+      spawnParticle('🚬 7-3 Marlboro', 'text-red-300');
+      setDialogue("Pongan 7-3, Marlboro rojo pao.");
+
+      triggerActionState('eating', 2000);
+      updateUI();
+    }
+
+    // Special 7-3 Audio Trigger Function
+    function play73Audio() {
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(350, now);
+        osc.frequency.setValueAtTime(450, now + 0.1);
+        osc.frequency.setValueAtTime(550, now + 0.2);
+        osc.frequency.setValueAtTime(700, now + 0.3);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } catch(e) {}
+
+      spawnParticle('🚬 7-3 PAO!', 'text-red-400');
+      setDialogue("Pongan 7-3, Marlboro rojo pao.");
+      triggerActionState('dancing', 2500);
+      updateUI();
+    }
+
+    function investMoney() {
+      playSound('click');
+      if (state.balance < 50) {
+        setDialogue("❌ Necesitas al menos $50 para mover la ruta.");
+        return;
+      }
+
+      state.balance -= 50;
+      const profit = 65;
+      state.balance += profit;
+      state.score += 10;
+      
+      playSound('invest');
+      spawnParticle('+$15 Rendimiento 📈', 'text-sky-300');
+      setDialogue("Abraham recuerda que el dinero es el medio, no el final.");
+      updateUI();
+    }
+
+    function petFercho() {
+      playSound('eat');
+      state.happiness = Math.min(100, state.happiness + 5);
+      spawnParticle('👑 ¡Qué pasó rey!', 'text-amber-300');
+      setDialogue("¡Qué pasó rey! ¿Cómo van las rutas pao?");
+      updateUI();
+    }
+
+    function triggerActionState(act, duration) {
+      state.actionState = act;
+      clearTimeout(state.actionTimer);
+      state.actionTimer = setTimeout(() => {
+        state.actionState = 'idle';
+      }, duration);
+    }
+
+    // --- TIME TICKER & CREDIMEX 4 PM RULE ---
+
+    function advanceTime(hours) {
+      for (let h = 0; h < hours; h++) {
+        state.hour++;
+
+        // 4:00 PM (16:00) CUTOFF CHECK
+        if (state.hour === 16 && state.debt > 0 && !state.paidToday && !state.lateFeeAppliedToday) {
+          state.debt += 150; // $150 Late fee
+          state.happiness = Math.max(0, state.happiness - 40);
+          state.score = Math.max(300, state.score - 40);
+          state.lateFeeAppliedToday = true;
+
+          playSound('penalty');
+          spawnParticle('🚨 ¡NECESITO UN PASE!', 'text-red-400');
+          setDialogue("¡Necesito un pase! Pasaron las 4:00 PM y cayó el recargo de $150.");
+          triggerActionState('anxious', 4000);
+        }
+
+        // New Day Reset at 24:00
+        if (state.hour >= 24) {
+          state.hour = 0;
+          state.day++;
+          state.paidToday = false;
+          state.lateFeeAppliedToday = false;
+          state.debt += 200; // New daily credit installment
+          setDialogue(`🌅 Día ${state.day}. ¡Qué pasó rey! Nueva cuota de $200 asignada.`);
+        }
+      }
+
+      updateUI();
+    }
+
+    function toggleFastMode() {
+      const btn = document.getElementById('fast-btn');
+      state.fastMode = !state.fastMode;
+
+      if (state.fastMode) {
+        btn.innerText = '⏸️ 1x';
+        btn.className = "bg-amber-600 hover:bg-amber-500 active:scale-95 text-white text-[8px] px-2 py-1.5 rounded-lg border-b-2 border-amber-900 font-bold";
+        state.fastInterval = setInterval(() => {
+          advanceTime(1);
+        }, 1500);
+      } else {
+        btn.innerText = '⚡ 2x';
+        btn.className = "bg-pink-600 hover:bg-pink-500 active:scale-95 text-white text-[8px] px-2 py-1.5 rounded-lg border-b-2 border-pink-900 font-bold";
+        clearInterval(state.fastInterval);
+      }
+    }
+
+    // --- MAIN INITIALIZATION LOOP ---
+    window.onload = function() {
+      updateUI();
+
+      // Set initial quote dialogue
+      setDialogue(getRandomQuote());
+
+      // Main Sprite Animation Loop (~30 FPS)
+      setInterval(() => {
+        renderSprite();
+      }, 33);
+
+      // Ambient Clock Tick (1 simulated minute every 2 seconds)
+      setInterval(() => {
+        if (!state.fastMode) {
+          state.minute += 10;
+          if (state.minute >= 60) {
+            state.minute = 0;
+            advanceTime(1);
+          } else {
+            updateUI();
+          }
+        }
+      }, 2000);
+    };
   </script>
 </body>
 </html>
